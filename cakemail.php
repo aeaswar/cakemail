@@ -1,16 +1,17 @@
 <?php
 
 	// Create connection
-	$conn = new mysqli("localhost","root","cakemail");
+	$DBServer = 'localhost';
+	$DBUser = 'root';
+	$DBPass = 'cakemail';
+	$DBName = 'cakemail';
+
+	$conn = new mysqli($DBServer, $DBUser, $DBPass, $DBName);
 
 	// Check connection
 	if ($conn->connect_error) {
 	  die("Failed to connect: " . $conn->connect_error);
 	}
-
-
-        // make foo the current db
-        mysqli_select_db($conn,"cakemail");
 
 
 	// Create table todo_list
@@ -46,6 +47,7 @@
 		} else {
 			echo "0 results";
 		}
+
 
 		// $data = array();
 		// foreach ($items as $item) {
@@ -87,7 +89,14 @@
 
 		$sql = "INSERT INTO todo_list (item_id, description, date_added, date_due, status) 
 		VALUES (DEFAULT, $description, $date_added, $date_due, $status)";
-		
+		//$result = $conn->query($sql);
+
+
+		if ($result->success() === TRUE) {
+			echo "Item added successfully";
+		} else {
+			echo "Error adding item: " . $conn->error;
+		}
 	});
 
 	// updated list based on item id
@@ -97,7 +106,7 @@
 	});
 
 	// delete item
-	$conn->delete('/cakemail/todo_list/delete/{item_id}', function ($item_id) use ($conn) {
+	$conn->delete('/cakemail/todo_list/delete/{item_id:[0-9]+}', function ($item_id) use ($conn) {
 
 		$sql = "DELETE FROM todo_list WHERE item_id = $item_id";
 		$result = $conn->query($sql);
